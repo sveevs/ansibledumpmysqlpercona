@@ -1,0 +1,43 @@
+- name: Dump Mysql Percone
+  hosts: Server
+  become: yes
+
+  vars:
+    dirbackup: /opt/backup/
+    backupserver: /media/video/.backup/server/
+    user: root
+    passw: Password
+    backupserver: /media/video/.backup/server/
+
+  tasks:
+
+  - name: Run Percone backup
+    shell: xtrabackup --backup --user="{{ user }}" --password="{{ passw }}" --target-dir="{{ dirbackup }}bgbillin.xtrabackup""{{ ansible_date_time.date }}"
+
+  - name: Run Percone prepare
+    shell: xtrabackup --prepare --target-dir="{{ dirbackup }}bgbillin.xtrabackup""{{ ansible_date_time.date }}"
+
+  - name: Compress Directory witn Bd "{{ dirbackup }}"
+    archive:
+      path: "{{ dirbackup }}bgbillin.xtrabackup{{ ansible_date_time.date }}"
+      dest: "{{ dirbackup }}bgbillin.xtrabackup{{ ansible_date_time.date }}.zip"
+      format: zip
+      force_archive: true
+
+  - name: Syncchronize Server Yellow
+    synchronize:
+      mode: pull
+      src: "{{ dirbackup }}bgbillin.xtrabackup{{ ansible_date_time.date }}.zip"
+      dest: "{{ backupserver + ansible_date_time.date + '/' + inventory_hostname }}billingallbases.xtrabackup.zip"
+
+  - name: Delete zip
+    file:
+      state: absent
+      path: "{{ dirbackup }}bgbillin.xtrabackup{{ ansible_date_time.date }}.zip"
+
+  - name: Delete Dir
+    file:
+      state: absent
+      path: "{{ dirbackup }}bgbillin.xtrabackup{{ ansible_date_time.date }}/"
+
+
