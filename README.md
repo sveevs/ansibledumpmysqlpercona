@@ -1,2 +1,2 @@
 # ansibledumpmysqlpercona
-Дамп Mysql с помощью Ansible и Percona (Что бы баз не вешалась)
+Дамп Mysql с помощью Ansible и Percona (Что бы БД не вешалась)
